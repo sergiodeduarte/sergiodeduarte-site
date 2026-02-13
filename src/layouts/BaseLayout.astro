@@ -1,0 +1,144 @@
+---
+import '../styles/global.css';
+
+const { title, description } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href="https://sergiodeduarte.com" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sergiodeduarte.com" />
+    <meta name="twitter:card" content="summary" />
+
+    <script>
+      (function () {
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          dataLayer.push(arguments);
+        }
+        window.gtag = window.gtag || gtag;
+
+        var stored = null;
+        try {
+          stored = localStorage.getItem('consentStatus');
+        } catch (e) {
+          stored = null;
+        }
+
+        var gpc = false;
+        try {
+          gpc = navigator.globalPrivacyControl === true;
+        } catch (e) {
+          gpc = false;
+        }
+
+        var defaultState = stored === 'granted' ? 'granted' : 'denied';
+        if (gpc) defaultState = 'denied';
+
+        gtag('consent', 'default', {
+          ad_storage: defaultState,
+          analytics_storage: defaultState,
+          functionality_storage: 'granted',
+          security_storage: 'granted'
+        });
+
+        if (stored === 'granted') {
+          gtag('consent', 'update', {
+            ad_storage: 'granted',
+            analytics_storage: 'granted'
+          });
+        }
+      })();
+    </script>
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NRJNQFMG');</script>
+    <!-- End Google Tag Manager -->
+  </head>
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NRJNQFMG"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <slot />
+
+    <div id="consent-banner" class="consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent">
+      <p>
+        This site uses cookies for analytics. You can accept or decline.
+      </p>
+      <div class="consent-actions">
+        <button id="consent-accept" class="btn primary" type="button">Accept</button>
+        <button id="consent-decline" class="btn" type="button">Decline</button>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        var banner = document.getElementById('consent-banner');
+        var accept = document.getElementById('consent-accept');
+        var decline = document.getElementById('consent-decline');
+
+        if (!banner || !accept || !decline) return;
+
+        var stored = null;
+        try {
+          stored = localStorage.getItem('consentStatus');
+        } catch (e) {
+          stored = null;
+        }
+
+        var gpc = false;
+        try {
+          gpc = navigator.globalPrivacyControl === true;
+        } catch (e) {
+          gpc = false;
+        }
+
+        if (stored === 'granted' || stored === 'denied' || gpc) {
+          banner.style.display = 'none';
+          return;
+        }
+
+        banner.style.display = 'grid';
+
+        accept.addEventListener('click', function () {
+          try {
+            localStorage.setItem('consentStatus', 'granted');
+          } catch (e) {}
+          if (window.gtag) {
+            window.gtag('consent', 'update', {
+              ad_storage: 'granted',
+              analytics_storage: 'granted'
+            });
+          }
+          banner.style.display = 'none';
+        });
+
+        decline.addEventListener('click', function () {
+          try {
+            localStorage.setItem('consentStatus', 'denied');
+          } catch (e) {}
+          if (window.gtag) {
+            window.gtag('consent', 'update', {
+              ad_storage: 'denied',
+              analytics_storage: 'denied'
+            });
+          }
+          banner.style.display = 'none';
+        });
+      })();
+    </script>
+  </body>
+</html>
